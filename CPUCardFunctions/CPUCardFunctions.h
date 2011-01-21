@@ -1,0 +1,22 @@
+// The following ifdef block is the standard way of creating macros which make exporting 
+// from a DLL simpler. All files within this DLL are compiled with the CPUCARDFUNCTIONS_EXPORTS
+// symbol defined on the command line. This symbol should not be defined on any project
+// that uses this DLL. This way any other project whose source files include this file see 
+// CPUCARDFUNCTIONS_API functions as being imported from a DLL, whereas this DLL sees symbols
+// defined with this macro as being exported.
+#ifdef CPUCARDFUNCTIONS_EXPORTS
+#define CPUCARDFUNCTIONS_API __declspec(dllexport)
+#else
+#define CPUCARDFUNCTIONS_API __declspec(dllimport)
+#endif
+
+// This class is exported from the CPUCardFunctions.dll
+class CPUCARDFUNCTIONS_API CCPUCardFunctions {
+public:
+	CCPUCardFunctions(void);
+	// TODO: add your methods here.
+};
+
+extern CPUCARDFUNCTIONS_API int nCPUCardFunctions;
+
+CPUCARDFUNCTIONS_API int fnCPUCardFunctions(void);
