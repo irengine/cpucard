@@ -6,9 +6,9 @@
 #include "tstdlibs.h"
 #include "CardFunctions.h"
 
-#define USER_INFO_FILE_NAME		"userinfo.ini"
-#define SUMMARY_FILE_NAME		"dealtotal.ini"
-#define DETAIL_FILE_NAME		"dealdetail.ini"
+#define USER_INFO_FILE_NAME		"c:\\scweigh\\userinfo.ini"
+#define SUMMARY_FILE_NAME		"c:\\scweigh\\dealtotal.ini"
+#define DETAIL_FILE_NAME		"c:\\scweigh\\dealdetail.ini"
 
 void WriteUserInfoFile();
 void WriteSummaryFile();
@@ -28,6 +28,7 @@ void TestWrite();
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+
 	TestRead();
 	TestWrite();
 
