@@ -10,13 +10,14 @@
 #define CPUCARDFUNCTIONS_API __declspec(dllimport)
 #endif
 
-// This class is exported from the CPUCardFunctions.dll
-class CPUCARDFUNCTIONS_API CCPUCardFunctions {
-public:
-	CCPUCardFunctions(void);
-	// TODO: add your methods here.
-};
+extern "C" CPUCARDFUNCTIONS_API int ReadTradeDetailFromCard(void);
 
-extern CPUCARDFUNCTIONS_API int nCPUCardFunctions;
+extern "C" CPUCARDFUNCTIONS_API int ReadTradeSummaryFromCard(void);
 
-CPUCARDFUNCTIONS_API int fnCPUCardFunctions(void);
+extern "C" CPUCARDFUNCTIONS_API int ReadUserInfoFromCard(void);
+
+extern "C" CPUCARDFUNCTIONS_API int WriteTradeDetailToCard(void);
+
+extern "C" CPUCARDFUNCTIONS_API int WriteTradeSummaryToCard(void);
+
+extern "C" CPUCARDFUNCTIONS_API int WriteUserInfoToCard(void);
