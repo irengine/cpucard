@@ -46,6 +46,10 @@ extern "C" __declspec(dllexport)int WriteTradeDetailInfo(int id, const char* a1,
 #define COMMAND_WRITE_TRADE_SUMMARY_INFO	0x08
 #define COMMAND_WRITE_TRADE_DETAIL_INFO		0x09
 
+#define LENGTH_COMMAND_WRITE_USER_INFO				90
+#define LENGTH_COMMAND_WRITE_TRADE_SUMMARY_INFO		12
+#define LENGTH_COMMAND_WRITE_TRADE_DETAIL_INFO		199
+
 CSerial serial;
 int iPort = 1;
 
@@ -67,7 +71,7 @@ void String2NChar(char* dst, std::string val, int cnt)
 	for(int i = 0; i < cnt; i++)
 	{
 		int b = (v & (0xff << 8*(cnt - i - 1))) >> 8*(cnt - i - 1);
-		std::cout << std::hex << b << std::endl;
+		//std::cout << std::hex << b << std::endl;
 		memset(dst + i, b, 1);
 	}
 }
@@ -141,6 +145,28 @@ int Execute(char* command)
 	memcpy(wMsg + 2, command, strlen(command));
 
 	int iCount = strlen(wMsg);
+	for(int i=2; i<iCount;i++)
+	{
+		iCRC = iCRC + wMsg[i];
+	}
+	memset(wMsg + iCount, iCRC & 0xff, 1);
+
+	char rMsg[MAXREADLENGTH] = {0};
+
+	return Action(rMsg, wMsg, iCount + 1);
+}
+
+// Execute command only
+int Execute(char* command, int len)
+{
+	char wMsg[MAXWRITELENGTH] = {0};
+	int iCRC = 0;
+
+	memset(wMsg, len + 2, 1);
+	memset(wMsg + 1, COMMAND_PREFIX, 1);
+	memcpy(wMsg + 2, command, len);
+
+	int iCount = len + 2;
 	for(int i=2; i<iCount;i++)
 	{
 		iCRC = iCRC + wMsg[i];
@@ -252,9 +278,9 @@ int WriteUserInfo(const char* a1, const char* a2, const char* a3, const char* a4
 	FixSpace(msg, a4, 27, 30);
 	FixSpace(msg, a5, 57, 18);
 	FixSpace(msg, a6, 75, 13);
-	FixSpace(msg, a7, 90, 2);
+	FixSpace(msg, a7, 88, 2);
 
-	return Execute(msg);
+	return Execute(msg, LENGTH_COMMAND_WRITE_USER_INFO);
 }
 
 int WriteTradeSummaryInfo(const char* a1, const char* a2, const char* a3)
@@ -266,7 +292,7 @@ int WriteTradeSummaryInfo(const char* a1, const char* a2, const char* a3)
 	FixSpace(msg, a2, 10, 1);
 	FixSpace(msg, a3, 11, 1);
 	
-	return Execute(msg);
+	return Execute(msg, LENGTH_COMMAND_WRITE_TRADE_SUMMARY_INFO);
 }
 
 int WriteTradeDetailInfo(int id, const char* a1, const char* a2, const char* a3, const char* a4, const char* a5, const char* a6, const char* a7, const char* a8, const char* a9, const char* a10, const char* a11, const char* a12, const char* a13)
@@ -284,12 +310,15 @@ int WriteTradeDetailInfo(int id, const char* a1, const char* a2, const char* a3,
 	FixSpace(msg, a7, 130 + 1, 30);
 	FixSpace(msg, a8, 160 + 1, 8);
 	FixSpace(msg, a9, 168 + 1, 6);
-	FixSpace(msg, a10, 174 + 1, 4);
-	FixSpace(msg, a11, 178 + 1, 4);
-	FixSpace(msg, a12, 182 + 1, 8);
+	
+	// fix do not fix space when number type
+	memcpy(msg + 174 + 1, a10, 4);
+	memcpy(msg + 178 + 1, a11, 4);
+	memcpy(msg + 182 + 1, a12, 8);
+
 	FixSpace(msg, a13, 190 + 1, 8);
 	
-	return Execute(msg);
+	return Execute(msg, LENGTH_COMMAND_WRITE_TRADE_DETAIL_INFO);
 }
 
 int ReadUserInfo(char* info)
