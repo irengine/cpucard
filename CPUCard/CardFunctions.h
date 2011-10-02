@@ -214,20 +214,18 @@ int Reset()
 	return Execute(msg);
 }
 
-int WriteUserInfo(const char* a1, const char* a2, const char* a3, const char* a4, const char* a5, const char* a6, const char* a7, const char* a8, const char* a9)
+int WriteUserInfo(const char* a1, const char* a2, const char* a3, const char* a4, const char* a5, const char* a6, const char* a7)
 {
 	char msg[256] = {0x20};
 	memset(msg, COMMAND_WRITE_USER_INFO, 1);
 	memset(msg + 1, 88, 1);
 	FixSpace(msg, a1, 2, 2);
 	FixSpace(msg, a2, 4, 10);
-	FixSpace(msg, a3, 14, 30);
-	FixSpace(msg, a4, 44, 7);
-	FixSpace(msg, a5, 51, 7);
-	FixSpace(msg, a6, 58, 20);
-	FixSpace(msg, a7, 78, 2);
-	FixSpace(msg, a8, 80, 2);
-	FixSpace(msg, a9, 82, 7);
+	FixSpace(msg, a3, 14, 13);
+	FixSpace(msg, a4, 27, 30);
+	FixSpace(msg, a5, 57, 18);
+	FixSpace(msg, a6, 75, 13);
+	FixSpace(msg, a7, 90, 2);
 
 	return Execute(msg);
 }

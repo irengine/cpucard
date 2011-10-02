@@ -43,28 +43,28 @@ void TestRead()
 		ReadUserInfo(userinfo);
 		ReadUserInfoData(userinfo);
 
-		char summary[256] = {0};
-		ReadTradeSummaryInfo(summary);
-		ReadSummaryData(summary);
+		//char summary[256] = {0};
+		//ReadTradeSummaryInfo(summary);
+		//ReadSummaryData(summary);
 
-		// Get id from ini file
-		try
-		{
-			CIniFile fDetail;
-			fDetail.Load(DETAIL_FILE_NAME);
+		//// Get id from ini file
+		//try
+		//{
+		//	CIniFile fDetail;
+		//	fDetail.Load(DETAIL_FILE_NAME);
 
-			std::string num = fDetail.GetSection("deallist")->GetKey("num")->GetValue();
+		//	std::string num = fDetail.GetSection("deallist")->GetKey("num")->GetValue();
 
-			int i = atoi(num.c_str());
-			char detail[256] = {0};
-			ReadTradeDetailInfo(i, detail);
-			ReadDetailData(num, detail);
-			return;
-		}
-		catch(...)
-		{
-			std::cout << "Error: Please check parameters in ini file.";
-		}
+		//	int i = atoi(num.c_str());
+		//	char detail[256] = {0};
+		//	ReadTradeDetailInfo(i, detail);
+		//	ReadDetailData(num, detail);
+		//	return;
+		//}
+		//catch(...)
+		//{
+		//	std::cout << "Error: Please check parameters in ini file.";
+		//}
 	}
 	else
 	{
@@ -80,9 +80,9 @@ void TestWrite()
 	{
 		WriteUserInfoData();
 
-		WriteSummaryData();
+		//WriteSummaryData();
 
-		WriteDetailData();
+		//WriteDetailData();
 
 		return;
 	}
@@ -102,23 +102,19 @@ void WriteUserInfoData()
 
 	std::string cardtype = fUserInfo.GetSection("userifmt")->GetKey("cardtype")->GetValue();
 	std::string cardid = fUserInfo.GetSection("userifmt")->GetKey("cardid")->GetValue();
-	std::string gysm = fUserInfo.GetSection("userifmt")->GetKey("gysm")->GetValue();
 	std::string clientno = fUserInfo.GetSection("userifmt")->GetKey("clientno")->GetValue();
-	std::string gybmno = fUserInfo.GetSection("userifmt")->GetKey("gybmno")->GetValue();
-	std::string idenno = fUserInfo.GetSection("userifmt")->GetKey("idenno")->GetValue();
+	std::string clientname = fUserInfo.GetSection("userifmt")->GetKey("clientname")->GetValue();
+	std::string clientid = fUserInfo.GetSection("userifmt")->GetKey("clientid")->GetValue();
+	std::string clientphone = fUserInfo.GetSection("userifmt")->GetKey("clientphone")->GetValue();
 	std::string clienttype = fUserInfo.GetSection("userifmt")->GetKey("clienttype")->GetValue();
-	std::string handletype = fUserInfo.GetSection("userifmt")->GetKey("handletype")->GetValue();
-	std::string seatno = fUserInfo.GetSection("userifmt")->GetKey("seatno")->GetValue();
 
 	WriteUserInfo(cardtype.c_str(),
 		cardid.c_str(),
-		gysm.c_str(),
 		clientno.c_str(),
-		gybmno.c_str(),
-		idenno.c_str(),
-		clienttype.c_str(),
-		handletype.c_str(),
-		seatno.c_str());
+		clientname.c_str(),
+		clientid.c_str(),
+		clientphone.c_str(),
+		clienttype.c_str());
 }
 
 void WriteSummaryData()
@@ -180,86 +176,45 @@ void WriteDetailData()
 
 void ReadUserInfoData(char* userinfo)
 {
-	//[userifmt]
-	//;卡类型
-	//cardtype=SC
-	//;卡号
-	//cardid=0123456789
-	//;客户名称
-	//gysm=张三
-	//;客户全市统一编码
-	//clientno=8712342
-	//;客户市场编码
-	//gybmno=0110092
-	//;客户身份证
-	//idenno=310106197801265513
-	//;客户类型
-	//clienttype=01
-	//;办卡类型
-	//handletype=01
-	//;客户摊位号
-	//seatno=1001005
-
-	//char userinfo[256] = {0x53, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x32, 0x34,
-	//					0x30, 0x30, 0xB3, 0xC2, 0xB1, 0xF3, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x30, 0x32, 0x31, 0x32, 0x32, 0x35, 0x37, 0x30,
-	//					0x32, 0x31, 0x32, 0x32, 0x35, 0x37, 0x34, 0x36, 0x33, 0x35,
-	//					0x31, 0x32, 0x31, 0x39, 0x38, 0x35, 0x30, 0x32, 0x31, 0x32,
-	//					0x34, 0x39, 0x38, 0x38, 0x20, 0x20, 0x30, 0x31, 0x30, 0x31,
-	//					0x34, 0x30, 0x30, 0x33, 0x30, 0x30, 0x32};
-
 	char msg[64];
-
-	//FixSpace(msg, a1, 2, 2);
-	//FixSpace(msg, a2, 4, 10);
-	//FixSpace(msg, a3, 14, 30);
-	//FixSpace(msg, a4, 44, 7);
-	//FixSpace(msg, a5, 51, 7);
-	//FixSpace(msg, a6, 58, 20);
-	//FixSpace(msg, a7, 78, 2);
-	//FixSpace(msg, a8, 80, 2);
-	//FixSpace(msg, a9, 82, 7);
 
 	std::stringstream sUserInfo;
 	sUserInfo << "[userifmt]" << std::endl;
 
+	// cardtype		length	2
 	memset(msg, 0, 64);
 	memcpy(msg, userinfo, 2);
 	sUserInfo << "cardtype=" << msg << std::endl;
 
+	// cardid		length	10
 	memset(msg, 0, 64);
 	memcpy(msg, userinfo + 2, 10);
 	sUserInfo << "cardid=" << msg << std::endl;
 
+	// clientno		length	13
 	memset(msg, 0, 64);
-	memcpy(msg, userinfo + 12, 30);
-	sUserInfo << "gysm=" << msg << std::endl;
-
-	memset(msg, 0, 64);
-	memcpy(msg, userinfo + 42, 7);
+	memcpy(msg, userinfo + 12, 13);
 	sUserInfo << "clientno=" << msg << std::endl;
 
+	// clientname	length	30
 	memset(msg, 0, 64);
-	memcpy(msg, userinfo + 49, 7);
-	sUserInfo << "gybmno=" << msg << std::endl;
+	memcpy(msg, userinfo + 25, 30);
+	sUserInfo << "clientname=" << msg << std::endl;
 
+	// clientid		length	18
 	memset(msg, 0, 64);
-	memcpy(msg, userinfo + 56, 20);
-	sUserInfo << "idenno=" << msg << std::endl;
+	memcpy(msg, userinfo + 55, 18);
+	sUserInfo << "clientid=" << msg << std::endl;
 
+	// clientphone		length	13
 	memset(msg, 0, 64);
-	memcpy(msg, userinfo + 76, 2);
+	memcpy(msg, userinfo + 73, 13);
+	sUserInfo << "clientphone=" << msg << std::endl;
+
+	// clienttype		length	2
+	memset(msg, 0, 64);
+	memcpy(msg, userinfo + 86, 2);
 	sUserInfo << "clienttype=" << msg << std::endl;
-
-	memset(msg, 0, 64);
-	memcpy(msg, userinfo + 78, 2);
-	sUserInfo << "handletype=" << msg << std::endl;
-
-	memset(msg, 0, 64);
-	memcpy(msg, userinfo + 80, 7);
-	sUserInfo << "seatno=" << msg << std::endl;
 
 	CIniFile fUserInfo;
 	sUserInfo >> fUserInfo;
