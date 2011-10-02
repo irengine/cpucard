@@ -56,6 +56,16 @@ void FixSpace(char* dst, const char* src, int start, int len)
 	memset(dst + start + l, 0x20, len - l);
 }
 
+char* String2Int(std::string val)
+{
+	int cnt = atoi(val.c_str());
+	char msg[64];
+	memset(msg, 0, 64);
+	memcpy(msg, &cnt, sizeof(int));
+
+	return msg;
+}
+
 int Action(char* readMsg, char* writeMsg, int len)
 {
 	char byteRead[MAXREADLENGTH]={0};
@@ -230,15 +240,14 @@ int WriteUserInfo(const char* a1, const char* a2, const char* a3, const char* a4
 	return Execute(msg);
 }
 
-int WriteTradeSummaryInfo(const char* a1, const char* a2, const char* a3, const char* a4)
+int WriteTradeSummaryInfo(const char* a1, const char* a2, const char* a3)
 {
 	char msg[256] = {0};
 	memset(msg, COMMAND_WRITE_TRADE_SUMMARY_INFO, 1);
 	memset(msg + 1, 16, 1);
-	FixSpace(msg, a1, 2, 10);
-	FixSpace(msg, a2, 12, 2);
-	FixSpace(msg, a3, 14, 1);
-	FixSpace(msg, a4, 15, 2);
+	FixSpace(msg, a1, 2, 8);
+	FixSpace(msg, a2, 10, 1);
+	FixSpace(msg, a3, 11, 1);
 	
 	return Execute(msg);
 }

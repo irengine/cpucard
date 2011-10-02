@@ -28,7 +28,6 @@ void TestWrite();
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-
 	TestRead();
 	TestWrite();
 
@@ -39,13 +38,13 @@ void TestRead()
 {
 	if (Setup(1) == S_OK)
 	{
-		char userinfo[256] = {0};
-		ReadUserInfo(userinfo);
-		ReadUserInfoData(userinfo);
+		//char userinfo[256] = {0};
+		//ReadUserInfo(userinfo);
+		//ReadUserInfoData(userinfo);
 
-		//char summary[256] = {0};
-		//ReadTradeSummaryInfo(summary);
-		//ReadSummaryData(summary);
+		char summary[256] = {0};
+		ReadTradeSummaryInfo(summary);
+		ReadSummaryData(summary);
 
 		//// Get id from ini file
 		//try
@@ -78,9 +77,9 @@ void TestWrite()
 {
 	if (Setup(1) == S_OK)
 	{
-		WriteUserInfoData();
+		//WriteUserInfoData();
 
-		//WriteSummaryData();
+		WriteSummaryData();
 
 		//WriteDetailData();
 
@@ -126,12 +125,10 @@ void WriteSummaryData()
 	std::string date = fSummary.GetSection("dealtotal")->GetKey("date")->GetValue();
 	std::string dealnum = fSummary.GetSection("dealtotal")->GetKey("dealnum")->GetValue();
 	std::string dealtype = fSummary.GetSection("dealtotal")->GetKey("dealtype")->GetValue();
-	std::string dealmart = fSummary.GetSection("dealtotal")->GetKey("dealmart")->GetValue();
 
 	WriteTradeSummaryInfo(date.c_str(),
-		dealnum.c_str(),
-		dealtype.c_str(),
-		dealmart.c_str());
+		String2Int(dealnum),
+		dealtype.c_str());
 }
 
 void WriteDetailData()
@@ -224,44 +221,26 @@ void ReadUserInfoData(char* userinfo)
 
 void ReadSummaryData(char* summary)
 {
-	//[dealtotal]
-	//;交易日期
-	//date=2010-09-15
-	//;交易笔数
-	//dealnum=20
-	//;交易类型
-	//dealtype=1
-	//;交易市场代码
-	//dealmart=01
-	
-	//char summary[256] = {0x32, 0x30, 0x31, 0x30, 0x2D, 0x30, 0x39, 0x2D, 0x32, 0x39,
-	//					0x32, 0x20, 0x31, 0x30, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00};
-
 	char msg[64];
-
-	//FixSpace(msg, a1, 2, 10);
-	//FixSpace(msg, a2, 12, 2);
-	//FixSpace(msg, a3, 14, 1);
-	//FixSpace(msg, a4, 15, 2);
+	int cnt = 0;
 
 	std::stringstream sSummary;
 	sSummary << "[dealtotal]" << std::endl;
 
+	// date		length	8
 	memset(msg, 0, 64);
-	memcpy(msg, summary, 10);
+	memcpy(msg, summary, 8);
 	sSummary << "date=" << msg << std::endl;
 
-	memset(msg, 0, 64);
-	memcpy(msg, summary + 10, 2);
-	sSummary << "dealnum=" << msg << std::endl;
+	// dealnum	length	1
+	cnt = 0;
+	memcpy(&cnt, summary + 8, 1);
+	sSummary << "dealnum=" << cnt << std::endl;
 
+	// dealtype	length	1
 	memset(msg, 0, 64);
-	memcpy(msg, summary + 12, 1);
+	memcpy(msg, summary + 9, 1);
 	sSummary << "dealtype=" << msg << std::endl;
-
-	memset(msg, 0, 64);
-	memcpy(msg, summary + 13, 2);
-	sSummary << "dealmart=" << msg << std::endl;
 
 	CIniFile fSummary;
 	sSummary >> fSummary;
