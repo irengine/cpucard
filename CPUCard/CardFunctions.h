@@ -49,6 +49,7 @@ extern "C" __declspec(dllexport)int WriteTradeDetailInfo(int id, const char* a1,
 CSerial serial;
 int iPort = 1;
 
+// Fix space to end of string
 void FixSpace(char* dst, const char* src, int start, int len)
 {
 	int l = strlen(src);
@@ -56,14 +57,30 @@ void FixSpace(char* dst, const char* src, int start, int len)
 	memset(dst + start + l, 0x20, len - l);
 }
 
-char* String2Int(std::string val)
+// convert string "100" to 0x00, 0x00, 0x00, 0x64
+void String2NChar(char* dst, std::string val, int cnt)
 {
-	int cnt = atoi(val.c_str());
-	char msg[64];
-	memset(msg, 0, 64);
-	memcpy(msg, &cnt, sizeof(int));
+	long v = atoi(val.c_str());
 
-	return msg;
+	memset(dst, 0, cnt + 1);
+
+	for(int i = 0; i < cnt; i++)
+	{
+		int b = (v & (0xff << 8*(cnt - i - 1))) >> 8*(cnt - i - 1);
+		std::cout << std::hex << b << std::endl;
+		memset(dst + i, b, 1);
+	}
+}
+
+// convert 0x00, 0x00, 0x00, 0x64 to 100
+long NChar2Long(const char* val, int cnt)
+{
+	long v = 0;
+	for(int i = 0; i < cnt; i++)
+	{
+		v+= (unsigned char)val[i] << (8*(cnt-i-1));
+	}
+	return v;
 }
 
 int Action(char* readMsg, char* writeMsg, int len)
@@ -258,19 +275,19 @@ int WriteTradeDetailInfo(int id, const char* a1, const char* a2, const char* a3,
 	memset(msg, COMMAND_WRITE_TRADE_DETAIL_INFO, 1);
 	memset(msg + 1, 200, 1);
 	memset(msg + 1 + 1, id, 1);
-	FixSpace(msg, a1, 2 + 1, 7);
-	FixSpace(msg, a2, 9 + 1, 30);
-	FixSpace(msg, a3, 39 + 1, 6);
-	FixSpace(msg, a4, 45 + 1, 2);
-	FixSpace(msg, a5, 47 + 1, 8);
-	FixSpace(msg, a6, 55 + 1, 10);
-	FixSpace(msg, a7, 65 + 1, 12);
-	FixSpace(msg, a8, 77 + 1, 13);
-	FixSpace(msg, a9, 90 + 1, 40);
-	FixSpace(msg, a10, 130 + 1, 20);
-	FixSpace(msg, a11, 150 + 1, 7);
-	FixSpace(msg, a12, 157 + 1, 30);
-	FixSpace(msg, a13, 187 + 1, 13);
+	FixSpace(msg, a1, 2 + 1, 20);
+	FixSpace(msg, a2, 22 + 1, 16);
+	FixSpace(msg, a3, 38 + 1, 13);
+	FixSpace(msg, a4, 51 + 1, 30);
+	FixSpace(msg, a5, 81 + 1, 40);
+	FixSpace(msg, a6, 121 + 1, 9);
+	FixSpace(msg, a7, 130 + 1, 30);
+	FixSpace(msg, a8, 160 + 1, 8);
+	FixSpace(msg, a9, 168 + 1, 6);
+	FixSpace(msg, a10, 174 + 1, 4);
+	FixSpace(msg, a11, 178 + 1, 4);
+	FixSpace(msg, a12, 182 + 1, 8);
+	FixSpace(msg, a13, 190 + 1, 8);
 	
 	return Execute(msg);
 }

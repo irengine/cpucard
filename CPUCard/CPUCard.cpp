@@ -42,9 +42,9 @@ void TestRead()
 		//ReadUserInfo(userinfo);
 		//ReadUserInfoData(userinfo);
 
-		char summary[256] = {0};
-		ReadTradeSummaryInfo(summary);
-		ReadSummaryData(summary);
+		//char summary[256] = {0};
+		//ReadTradeSummaryInfo(summary);
+		//ReadSummaryData(summary);
 
 		//// Get id from ini file
 		//try
@@ -79,7 +79,7 @@ void TestWrite()
 	{
 		//WriteUserInfoData();
 
-		WriteSummaryData();
+		//WriteSummaryData();
 
 		//WriteDetailData();
 
@@ -126,8 +126,11 @@ void WriteSummaryData()
 	std::string dealnum = fSummary.GetSection("dealtotal")->GetKey("dealnum")->GetValue();
 	std::string dealtype = fSummary.GetSection("dealtotal")->GetKey("dealtype")->GetValue();
 
+	char mdealnum[64];
+	String2NChar(mdealnum, dealnum, 1);
+
 	WriteTradeSummaryInfo(date.c_str(),
-		String2Int(dealnum),
+		mdealnum,
 		dealtype.c_str());
 }
 
@@ -139,36 +142,56 @@ void WriteDetailData()
 
 	std::string num = fDetail.GetSection("deallist")->GetKey("num")->GetValue();
 
-	std::string clientno = fDetail.GetSection("deallist")->GetKey("clientno")->GetValue();
-	std::string gysm = fDetail.GetSection("deallist")->GetKey("gysm")->GetValue();
+	std::string traceno = fDetail.GetSection("deallist")->GetKey("traceno")->GetValue();
+	std::string batchno = fDetail.GetSection("deallist")->GetKey("batchno")->GetValue();
+	std::string sellercode = fDetail.GetSection("deallist")->GetKey("sellercode")->GetValue();
+	std::string sellername = fDetail.GetSection("deallist")->GetKey("sellername")->GetValue();
+	std::string producingarea = fDetail.GetSection("deallist")->GetKey("producingarea")->GetValue();
+	std::string marketcode = fDetail.GetSection("deallist")->GetKey("marketcode")->GetValue();
+	std::string marketname = fDetail.GetSection("deallist")->GetKey("marketname")->GetValue();
 	std::string uid = fDetail.GetSection("deallist")->GetKey("uid")->GetValue();
 	std::string areano = fDetail.GetSection("deallist")->GetKey("areano")->GetValue();
-	std::string quan = fDetail.GetSection("deallist")->GetKey("quan")->GetValue();
+	std::string quantity = fDetail.GetSection("deallist")->GetKey("quantity")->GetValue();
 	std::string weight = fDetail.GetSection("deallist")->GetKey("weight")->GetValue();
-	std::string amount = fDetail.GetSection("deallist")->GetKey("amount")->GetValue();
-	std::string backward = fDetail.GetSection("deallist")->GetKey("backward")->GetValue();
-	std::string basename = fDetail.GetSection("deallist")->GetKey("basename")->GetValue();
-	std::string producer = fDetail.GetSection("deallist")->GetKey("producer")->GetValue();
-	std::string lastgybm = fDetail.GetSection("deallist")->GetKey("lastgybm")->GetValue();
-	std::string lastgysm = fDetail.GetSection("deallist")->GetKey("lastgysm")->GetValue();
-	std::string lastbkwd = fDetail.GetSection("deallist")->GetKey("lastbkwd")->GetValue();
+	std::string unitprice = fDetail.GetSection("deallist")->GetKey("unitprice")->GetValue();
+	std::string vechicleno = fDetail.GetSection("deallist")->GetKey("vechicleno")->GetValue();
+
+	char mquantity[64];
+	String2NChar(mquantity, quantity, 4);
+
+	char mweight[64];
+	String2NChar(mweight, weight, 4);
+
+	std::string up = unitprice.substr(0, unitprice.find("."));
+	std::string down = unitprice.substr(unitprice.find(".") + 1);
+
+	char mup[64];
+	String2NChar(mup, up, 4);
+
+	char mdown[64];
+	String2NChar(mdown, down, 4);
+
+	char munitprice[64];
+	memset(munitprice, 0, 64);
+	memcpy(munitprice, mup, 4);
+	memcpy(munitprice + 4, mdown, 4);
 
 	int i = atoi(num.c_str());
 
 	WriteTradeDetailInfo(i,
-		clientno.c_str(),
-		gysm.c_str(),
+		traceno.c_str(),
+		batchno.c_str(),
+		sellercode.c_str(),
+		sellername.c_str(),
+		producingarea.c_str(),
+		marketcode.c_str(),
+		marketname.c_str(),
 		uid.c_str(),
 		areano.c_str(),
-		quan.c_str(),
-		weight.c_str(),
-		amount.c_str(),
-		backward.c_str(),
-		basename.c_str(),
-		producer.c_str(),
-		lastgybm.c_str(),
-		lastgysm.c_str(),
-		lastbkwd.c_str());
+		mquantity,
+		mweight,
+		munitprice,
+		vechicleno.c_str());
 }
 
 void ReadUserInfoData(char* userinfo)
@@ -222,7 +245,7 @@ void ReadUserInfoData(char* userinfo)
 void ReadSummaryData(char* summary)
 {
 	char msg[64];
-	int cnt = 0;
+	char val[5];
 
 	std::stringstream sSummary;
 	sSummary << "[dealtotal]" << std::endl;
@@ -233,9 +256,9 @@ void ReadSummaryData(char* summary)
 	sSummary << "date=" << msg << std::endl;
 
 	// dealnum	length	1
-	cnt = 0;
-	memcpy(&cnt, summary + 8, 1);
-	sSummary << "dealnum=" << cnt << std::endl;
+	memset(val, 0, 5);
+	memcpy(val, summary + 8, 1);
+	sSummary << "dealnum=" << NChar2Long(val, 1) << std::endl;
 
 	// dealtype	length	1
 	memset(msg, 0, 64);
@@ -250,131 +273,85 @@ void ReadSummaryData(char* summary)
 
 void ReadDetailData(std::string id, char* detail)
 {
-	//[deallist]
-	//;第几笔交易
-	//num=1
-	//;供货客户统一编码
-	//clientno=0110092
-	//;供货客户名称
-	//gysm=张三
-	//;商品统一编码
-	//uid=31
-	//;产地统一编码
-	//areano=31
-	//;成交数量
-	//quan=5
-	//;成交重量
-	//weight=2000
-	//;成交金额
-	//amount=4300
-	//;追溯码
-	//backward=010123456789a
-	//;生产基地
-	//basename=山东寿光
-	//;生产者
-	//producer=李明
-	//;一级批供应商编码
-	//lastgybm=0200891
-	//;一级批供应商名称
-	//lastgysm=王勇
-	//;一级批追溯码
-	//lastbkwd=010123456789a
-
-	//char detail[256] = {0x30, 0x32, 0x30, 0x30, 0x30, 0x30, 0x34, 0xBD, 0xF0, 0xB0,
-	//					0xAE, 0xC1, 0xBC, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x31, 0x30,
-	//					0x30, 0x30, 0x31, 0x30, 0x31, 0x31, 0x2E, 0x30, 0x30, 0x20,
-	//					0x20, 0x20, 0x20, 0x31, 0x32, 0x35, 0x2E, 0x30, 0x30, 0x20,
-	//					0x20, 0x20, 0x20, 0x33, 0x37, 0x35, 0x2E, 0x30, 0x30, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x34, 0x30, 0x30, 0x33, 0x30,
-	//					0x30, 0x32, 0x31, 0x30, 0x30, 0x39, 0x32, 0x39, 0xC9, 0xCF,
-	//					0xBA, 0xA3, 0xC4, 0xCF, 0xD1, 0xF4, 0xCA, 0xDF, 0xB2, 0xCB,
-	//					0xB4, 0xF3, 0xC5, 0xEF, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0xBD, 0xF0,
-	//					0xB0, 0xAE, 0xC1, 0xBC, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x32,
-	//					0x30, 0x30, 0x30, 0x30, 0x34, 0xBD, 0xF0, 0xB0, 0xAE, 0xC1,
-	//					0xBC, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-	//					0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x30, 0x30, 0x31, 0x31,
-	//					0x33, 0x32, 0x31, 0x32, 0x35, 0x38, 0x39, 0x35};
-
 	char msg[64];
-
-	//FixSpace(msg, a1, 2, 7);
-	//FixSpace(msg, a2, 9, 30);
-	//FixSpace(msg, a3, 39, 6);
-	//FixSpace(msg, a4, 45, 2);
-	//FixSpace(msg, a5, 47, 8);
-	//FixSpace(msg, a6, 55, 10);
-	//FixSpace(msg, a7, 65, 12);
-	//FixSpace(msg, a8, 77, 13);
-	//FixSpace(msg, a9, 90, 40);
-	//FixSpace(msg, a10, 130, 20);
-	//FixSpace(msg, a11, 150, 7);
-	//FixSpace(msg, a12, 157, 30);
-	//FixSpace(msg, a13, 187, 13);
+	char val[5];
 
 	std::stringstream sDetail;
 	sDetail << "[deallist]" << std::endl;
 
+	// id
 	memset(msg, 0, 64);
 	memcpy(msg, id.c_str(), strlen(id.c_str()));
 	sDetail << "num=" << msg << std::endl;
 	
+	// traceno		length	20
 	memset(msg, 0, 64);
-	memcpy(msg, detail, 7);
-	sDetail << "clientno=" << msg << std::endl;
+	memcpy(msg, detail, 20);
+	sDetail << "traceno=" << msg << std::endl;
 
+	// batchno		length	16
 	memset(msg, 0, 64);
-	memcpy(msg, detail + 7, 30);
-	sDetail << "gysm=" << msg << std::endl;
+	memcpy(msg, detail + 20, 16);
+	sDetail << "batchno=" << msg << std::endl;
 
+	// sellercode	length	13
 	memset(msg, 0, 64);
-	memcpy(msg, detail + 37, 6);
+	memcpy(msg, detail + 36, 13);
+	sDetail << "sellercode=" << msg << std::endl;
+
+	// sellername	length	30
+	memset(msg, 0, 64);
+	memcpy(msg, detail + 49, 30);
+	sDetail << "sellername=" << msg << std::endl;
+
+	// producingarea	length	40
+	memset(msg, 0, 64);
+	memcpy(msg, detail + 79, 40);
+	sDetail << "producingarea=" << msg << std::endl;
+
+	// marketcode	length	9
+	memset(msg, 0, 64);
+	memcpy(msg, detail + 119, 9);
+	sDetail << "marketcode=" << msg << std::endl;
+
+	// marketname	length	30
+	memset(msg, 0, 64);
+	memcpy(msg, detail + 128, 30);
+	sDetail << "marketname=" << msg << std::endl;
+
+	// uid			length	8
+	memset(msg, 0, 64);
+	memcpy(msg, detail + 158, 8);
 	sDetail << "uid=" << msg << std::endl;
 
+	// areano		length	6
 	memset(msg, 0, 64);
-	memcpy(msg, detail + 43, 2);
+	memcpy(msg, detail + 166, 6);
 	sDetail << "areano=" << msg << std::endl;
 
-	memset(msg, 0, 64);
-	memcpy(msg, detail + 45, 8);
-	sDetail << "quan=" << msg << std::endl;
+	// quantity		length	4
+	memset(val, 0, 5);
+	memcpy(val, detail + 172, 4);
+	sDetail << "quantity=" << NChar2Long(val, 4) << std::endl;
 
-	memset(msg, 0, 64);
-	memcpy(msg, detail + 53, 10);
-	sDetail << "weight=" << msg << std::endl;
+	// weight		length	4
+	memset(val, 0, 5);
+	memcpy(val, detail + 176, 4);
+	sDetail << "weight=" << NChar2Long(val, 4) << std::endl;
 
-	memset(msg, 0, 64);
-	memcpy(msg, detail + 63, 12);
-	sDetail << "amount=" << msg << std::endl;
+	// unitprice	length	8
+	memset(val, 0, 5);
+	memcpy(val, detail + 180, 4);
+	sDetail << "unitprice=" << NChar2Long(val, 4);
 
-	memset(msg, 0, 64);
-	memcpy(msg, detail + 75, 13);
-	sDetail << "backward=" << msg << std::endl;
+	memset(val, 0, 5);
+	memcpy(val, detail + 184, 4);
+	sDetail << "." << NChar2Long(val, 4) << std::endl;
 
+	// vechicleno	length	8
 	memset(msg, 0, 64);
-	memcpy(msg, detail + 88, 40);
-	sDetail << "basename=" << msg << std::endl;
-
-	memset(msg, 0, 64);
-	memcpy(msg, detail + 128, 20);
-	sDetail << "producer=" << msg << std::endl;
-
-	memset(msg, 0, 64);
-	memcpy(msg, detail + 148, 7);
-	sDetail << "lastgybm=" << msg << std::endl;
-
-	memset(msg, 0, 64);
-	memcpy(msg, detail + 155, 30);
-	sDetail << "lastgysm=" << msg << std::endl;
-
-	memset(msg, 0, 64);
-	memcpy(msg, detail + 185, 13);
-	sDetail << "lastbkwd=" << msg << std::endl;
+	memcpy(msg, detail + 188, 8);
+	sDetail << "vechicleno=" << msg << std::endl;
 
 	CIniFile fDetail;
 	sDetail >> fDetail;
