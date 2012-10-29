@@ -81,7 +81,7 @@ void TestWrite()
 
 		//WriteSummaryData();
 
-		//WriteDetailData();
+		WriteDetailData();
 
 		return;
 	}
@@ -157,24 +157,13 @@ void WriteDetailData()
 	std::string vechicleno = fDetail.GetSection("deallist")->GetKey("vechicleno")->GetValue();
 
 	char mquantity[64];
-	String2NChar(mquantity, quantity, 4);
+	String2NChar(mquantity, quantity, 4, 100);
 
 	char mweight[64];
-	String2NChar(mweight, weight, 4);
-
-	std::string up = unitprice.substr(0, unitprice.find("."));
-	std::string down = unitprice.substr(unitprice.find(".") + 1);
-
-	char mup[64];
-	String2NChar(mup, up, 4);
-
-	char mdown[64];
-	String2NChar(mdown, down, 4);
+	String2NChar(mweight, weight, 4, 100);
 
 	char munitprice[64];
-	memset(munitprice, 0, 64);
-	memcpy(munitprice, mup, 4);
-	memcpy(munitprice + 4, mdown, 4);
+	String2NChar(munitprice, unitprice, 8, 100);
 
 	int i = atoi(num.c_str());
 
@@ -332,21 +321,17 @@ void ReadDetailData(std::string id, char* detail)
 	// quantity		length	4
 	memset(val, 0, 5);
 	memcpy(val, detail + 172, 4);
-	sDetail << "quantity=" << NChar2Long(val, 4) << std::endl;
+	sDetail << "quantity=" << NChar2Float(val, 4, 100) << std::endl;
 
 	// weight		length	4
 	memset(val, 0, 5);
 	memcpy(val, detail + 176, 4);
-	sDetail << "weight=" << NChar2Long(val, 4) << std::endl;
+	sDetail << "weight=" << NChar2Float(val, 4, 100) << std::endl;
 
 	// unitprice	length	8
-	memset(val, 0, 5);
-	memcpy(val, detail + 180, 4);
-	sDetail << "unitprice=" << NChar2Long(val, 4);
-
-	memset(val, 0, 5);
-	memcpy(val, detail + 184, 4);
-	sDetail << "." << NChar2Long(val, 4) << std::endl;
+	memset(val, 0, 9);
+	memcpy(val, detail + 180, 8);
+	sDetail << "unitprice=" << NChar2Float(val, 8, 100) << std::endl;
 
 	// vechicleno	length	8
 	memset(msg, 0, 64);

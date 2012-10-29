@@ -61,30 +61,41 @@ void FixSpace(char* dst, const char* src, int start, int len)
 	memset(dst + start + l, 0x20, len - l);
 }
 
-// convert string "100" to 0x00, 0x00, 0x00, 0x64
-void String2NChar(char* dst, std::string val, int cnt)
+// default: convert string "100" to 0x00, 0x00, 0x00, 0x64
+// return result * multiple 
+void String2NChar(char* dst, std::string val, int cnt, int multiple = 1)
 {
-	long v = atoi(val.c_str());
+	long v = atof(val.c_str()) * multiple;
 
 	memset(dst, 0, cnt + 1);
 
-	for(int i = 0; i < cnt; i++)
+	for(int i = 0; i < 4; i++)
 	{
-		int b = (v & (0xff << 8*(cnt - i - 1))) >> 8*(cnt - i - 1);
-		//std::cout << std::hex << b << std::endl;
-		memset(dst + i, b, 1);
+		int b = (v & (0xff << 8*(4 - i - 1))) >> 8*(4 - i - 1);
+		memset(dst + i + cnt - 4, b, 1);
 	}
 }
 
-// convert 0x00, 0x00, 0x00, 0x64 to 100
-long NChar2Long(const char* val, int cnt)
+// default: convert 0x00, 0x00, 0x00, 0x64 to 100
+// return result / divisor
+long NChar2Long(const char* val, int cnt, int divisor = 1)
 {
 	long v = 0;
 	for(int i = 0; i < cnt; i++)
 	{
 		v+= (unsigned char)val[i] << (8*(cnt-i-1));
 	}
-	return v;
+	return v / divisor;
+}
+
+float NChar2Float(const char* val, int cnt, int divisor = 1)
+{
+	float v = 0;
+	for(int i = 0; i < cnt; i++)
+	{
+		v+= (unsigned char)val[i] << (8*(cnt-i-1));
+	}
+	return v / divisor;
 }
 
 int Action(char* readMsg, char* writeMsg, int len)
